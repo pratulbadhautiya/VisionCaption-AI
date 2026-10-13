@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VisionCaption AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="container">
+        
+    <header class="navbar">
+    <a class="logo" href="/">Vision<span>Caption</span> AI</a>
+
+        <div class="header-right">
+            <span class="status">● AI Caption Generator</span>
+            <span class="author-name">By Pratul Badhautiya</span>
+        </div>
+    </header>
+
+
+        <section class="hero">
+            <p class="eyebrow">COMPUTER VISION × NATURAL LANGUAGE PROCESSING</p>
+            <h1>Every picture<br><span>has a story.</span></h1>
+            <p class="subtitle">
+                Upload an image and let artificial intelligence
+                transform it into a natural-language caption.
+            </p>
+        </section>
+
+        <section class="workspace">
+            <div class="panel">
+                <p class="step">STEP 01</p>
+                <h2>Upload your image</h2>
+                <p class="muted">Choose a photo from your device.</p>
+
+                <form method="POST" enctype="multipart/form-data"
+                      id="uploadForm">
+                    <label class="dropzone" for="image">
+                        <input type="file" name="image" id="image"
+                               accept=".jpg,.jpeg,.png,.webp" required>
+                        <div class="upload-icon">↑</div>
+                        <strong id="fileName">Drop your image here</strong>
+                        <span>or click to browse</span>
+                        <small>JPG, PNG, WEBP · Maximum 10 MB</small>
+                        <img id="preview" alt="Selected image preview" hidden>
+                    </label>
+
+                    <button class="primary-button" id="submitButton"
+                            type="submit">
+                        Generate Caption <span>↗</span>
+                    </button>
+                </form>
+            </div>
+
+            <div class="panel result-panel">
+                <p class="step">STEP 02</p>
+                <h2>Your AI caption</h2>
+                <p class="muted">The generated description appears here.</p>
+
+                {% if image_url %}
+                    <div class="result-image-box">
+                        <img src="{{ image_url }}" alt="Uploaded image"
+                             class="result-image">
+                    </div>
+                {% else %}
+                    <div class="placeholder">
+                        <div class="placeholder-symbol">✳</div>
+                        <p>Your image preview will appear here.</p>
+                    </div>
+                {% endif %}
+
+                {% if caption %}
+                    <div class="caption-box">
+                        <span class="caption-label">GENERATED DESCRIPTION</span>
+                        <p id="captionText">{{ caption }}</p>
+                        <button type="button" id="copyButton"
+                                class="copy-button">Copy caption</button>
+                    </div>
+                {% else %}
+                    <div class="caption-placeholder">
+                        Your caption will appear here after analysis.
+                    </div>
+                {% endif %}
+
+                {% if error %}
+                    <div class="error" role="alert">{{ error }}</div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="process">
+            <p class="eyebrow">HOW IT WORKS</p>
+            <div class="process-grid">
+                <article>
+                    <span>01</span>
+                    <h3>Upload image</h3>
+                    <p>Select a photo for analysis.</p>
+                </article>
+                <article>
+                    <span>02</span>
+                    <h3>ResNet50</h3>
+                    <p>Extract visual features.</p>
+                </article>
+                <article>
+                    <span>03</span>
+                    <h3>LSTM network</h3>
+                    <p>Generate a word-by-word caption.</p>
+                </article>
+            </div>
+        </section>
+
+        <footer>
+            <span>VisionCaption AI</span>
+            <span>Python · TensorFlow · Flask</span>
+        </footer>
+    </main>
+
+    <script>
+        const input = document.getElementById("image");
+        const preview = document.getElementById("preview");
+        const fileName = document.getElementById("fileName");
+        const form = document.getElementById("uploadForm");
+        const submitButton = document.getElementById("submitButton");
+
+        input.addEventListener("change", function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            if (file.size > 10 * 1024 * 1024) {
+                alert("Please select an image smaller than 10 MB.");
+                this.value = "";
+                preview.hidden = true;
+                return;
+            }
+
+            if (!file.type.startsWith("image/")) {
+                alert("Please select a valid image.");
+                this.value = "";
+                preview.hidden = true;
+                return;
+            }
+
+            fileName.textContent = file.name;
+            preview.src = URL.createObjectURL(file);
+            preview.hidden = false;
+        });
+
+        form.addEventListener("submit", function () {
+            submitButton.disabled = true;
+            submitButton.textContent = "Generating caption...";
+        });
+
+        const copyButton = document.getElementById("copyButton");
+
+        if (copyButton) {
+            copyButton.addEventListener("click", async function () {
+                const caption =
+                    document.getElementById("captionText").innerText;
+
+                try {
+                    await navigator.clipboard.writeText(caption);
+                    copyButton.textContent = "Copied!";
+                } catch {
+                    alert("Please copy the caption manually.");
+                }
+            });
+        }
+    </script>
+</body>
+</html>

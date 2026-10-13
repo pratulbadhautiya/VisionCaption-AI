@@ -1,0 +1,10 @@
+
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+image_caption_model.keras
+tokenizer.pkl
+static/uploads/*
+!static/uploads/.gitkeep

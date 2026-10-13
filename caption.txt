@@ -1,0 +1,3 @@
+dog.jpg,A dog is playing in the grass.
+cat.jpg,A cat is sitting on a sofa.
+bird.jpg,A bird is sitting on a tree branch.
